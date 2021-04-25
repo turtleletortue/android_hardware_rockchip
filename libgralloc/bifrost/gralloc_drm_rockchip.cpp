@@ -7,7 +7,7 @@
 #define LOG_TAG "GRALLOC-ROCKCHIP"
 
 // #define ENABLE_DEBUG_LOG
-#include <log/custom_log.h>
+#include "custom_log.h"
 
 
 #include <log/log.h>

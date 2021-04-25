@@ -29,7 +29,7 @@
 #define LOG_TAG "GRALLOC-MOD"
 
 // #define ENABLE_DEBUG_LOG
-#include <log/custom_log.h>
+#include "custom_log.h"
 
 #include <log/log.h>
 #include <stdlib.h>
@@ -604,7 +604,7 @@ drm_module_t::drm_module_t()
     base.lock_ycbcr = drm_mod_lock_ycbcr;
     base.unlock = drm_mod_unlock;
     base.perform = drm_mod_perform;
-    base.validateBufferSize = drm_validate_buffer_size;
+	base.validateBufferSize = drm_validate_buffer_size;
 
     mutex = PTHREAD_MUTEX_INITIALIZER;
     drm = NULL;
