@@ -33,6 +33,11 @@
 #elif defined (USE_DRM)
 #include <gralloc_drm_handle.h>
 #define private_handle_t gralloc_drm_handle_t
+#elif defined (USE_GRALLOC_4)
+#include "platform_gralloc4.h"
+#include "src/mali_gralloc_formats.h"
+#include "custom_log.h"
+#define private_handle_t buffer_handle_t
 #else
 #include <gralloc_priv.h>
 #endif
@@ -41,6 +46,44 @@ int32_t Rockchip_get_gralloc_private(uint32_t *handle,gralloc_private_handle_t *
     if(private_hnd == NULL){
         return -1;
     }
+#ifdef USE_GRALLOC_4
+    private_handle_t priv_hnd = (private_handle_t)handle;
+    int format_requested, share_fd, pixel_stride,err;
+    uint64_t allocation_size;
+    err = gralloc4::get_format_requested(priv_hnd, &format_requested);
+    if (err != android::OK )
+    {
+        E("get_format_requested err : %d", err);
+        //return err;
+    }else{
+        private_hnd->format = format_requested;
+    }
+    err = gralloc4::get_share_fd(priv_hnd, &share_fd);
+    if (err != android::OK )
+    {
+        E("get_share_fd err : %d", err);
+        //return err;
+    }else{
+        private_hnd->share_fd = share_fd;
+    }
+    err = gralloc4::get_pixel_stride(priv_hnd, &pixel_stride);
+    if (err != android::OK )
+    {
+        E("get_pixel_stride err : %d", err);
+        //return err;
+    }else{
+        private_hnd->stride = pixel_stride;
+    }
+    err = gralloc4::get_allocation_size(priv_hnd, &allocation_size);
+    if (err != android::OK )
+    {
+        E("get_allocation_size err : %d", err);
+        //return err;
+    }else{
+        private_hnd->size = (int)allocation_size;
+    }
+
+#else
     private_handle_t *priv_hnd = (private_handle_t *)handle;
     private_hnd->format = priv_hnd->format;
 
@@ -57,6 +100,7 @@ int32_t Rockchip_get_gralloc_private(uint32_t *handle,gralloc_private_handle_t *
     private_hnd->stride = priv_hnd->stride;
 #endif
     private_hnd->size = priv_hnd->size;
+#endif
     return 0;
 }
 

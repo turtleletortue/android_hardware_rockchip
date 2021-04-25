@@ -35,7 +35,7 @@ USE_MPP := true
 endif
 
 ifeq (1, $(strip $(shell expr $(PLATFORM_SDK_VERSION) \>= 24)))
-  ifneq ($(filter rk3288 rk3126c rk3368 rk3326, $(strip $(TARGET_BOARD_PLATFORM))), )
+  ifneq ($(filter rk3288 rk3126c rk3368, $(strip $(TARGET_BOARD_PLATFORM))), )
     USE_MPP := true
   endif
 endif
@@ -56,20 +56,21 @@ LOCAL_ARM_MODE := arm
 LOCAL_PROPRIETARY_MODULE := true
 
 LOCAL_PRELINK_MODULE := false
-
-
+LOCAL_CFLAGS += -Wno-unused-parameter -Wno-error -Wno-unused-variable
 LOCAL_SHARED_LIBRARIES := libcutils libion liblog
-LOCAL_STATIC_LIBRARIES := #ibion_vpu #libvpu_mem_pool
+
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH) \
 		    $(LOCAL_PATH)/.. \
 		    $(LOCAL_PATH)/include \
 		    $(LOCAL_PATH)/libvpu_mem_pool \
 		    $(TOP)/hardware/libhardware/include \
-
+		    $(TOP)/system/core/include \
+		    
 LOCAL_C_INCLUDES += \
-        system/core/libion/include \
-        system/core/libion/kernel-headers
+    system/memory/libion/include \
+    system/memory/libion/kernel-headers
+
 LOCAL_SRC_FILES := vpu_mem_dmabuf.c \
 				   rk_list.cpp \
 				   vpu_mem_pool/vpu_mem_pool.c \

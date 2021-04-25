@@ -52,7 +52,7 @@
 #include "vpu_mem_pool/vpu_mem_pool.h"
 #include "vpu_mem_pool/vpu_dma_buf.h"
 #include "vpu.h"
-#define LOG_TAG "vpu_mem_dmabuf"
+//#define LOG_TAG "vpu_mem_dmabuf"
 #ifdef AVS40
 #undef ALOGV
 #define ALOGV LOGV

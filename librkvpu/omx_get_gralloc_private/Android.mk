@@ -26,7 +26,7 @@ LOCAL_SHARED_LIBRARIES := liblog libutils
 LOCAL_MODULE := libgralloc_priv_omx
 LOCAL_MODULE_TAGS := optional
 LOCAL_PROPRIETARY_MODULE := true
-
+LOCAL_CFLAGS += -Wno-unused-parameter -Wno-unused-variable
 LOCAL_HEADER_LIBRARIES += \
 	liblog_headers
 
@@ -34,10 +34,35 @@ LOCAL_C_INCLUDES := \
 	hardware/libhardware/include \
 	system/core/liblog/include
 
+ifeq ($(TARGET_RK_GRALLOC_VERSION),4)
+LOCAL_SRC_FILES += \
+    platform_gralloc4.cpp
+LOCAL_SHARED_LIBRARIES += \
+    libsync \
+    libhidlbase \
+    libgralloctypes \
+    android.hardware.graphics.mapper@4.0
+LOCAL_C_INCLUDES += \
+	frameworks/native/include \
+	system/core/libsync \
+	system/core/libsync/include\
+	external/libdrm/include/drm
+LOCAL_CFLAGS += -DUSE_GRALLOC_4
+else
+ifeq ($(strip $(BOARD_USE_DRM)), true)
+ifneq ($(filter rk3399 rk3366 rk3288 rk356x rk3128h rk322x rk3126c rk3328 rk3326 rk3399pro rk3228h, $(strip $(TARGET_BOARD_PLATFORM))), )
+    LOCAL_CFLAGS += -DUSE_DRM -DRK_DRM_GRALLOC=1 -DMALI_AFBC_GRALLOC=1
+ifeq ($(TARGET_USES_HWC2),true)
+    LOCAL_CFLAGS += -DUSE_HWC2
+endif
+endif
+endif
+endif
+
 # API 29 -> Android 10.0
 ifneq (1,$(strip $(shell expr $(PLATFORM_SDK_VERSION) \< 29)))
 
-ifeq ($(strip $(TARGET_BOARD_PLATFORM_GPU)), mali-tDVx)
+ifneq (,$(filter mali-tDVx mali-G52, $(TARGET_BOARD_PLATFORM_GPU)))
 LOCAL_C_INCLUDES += \
 	hardware/rockchip/libgralloc/bifrost
 endif
@@ -79,20 +104,8 @@ endif
 ifeq ($(strip $(TARGET_BOARD_PLATFORM_GPU)),G6110)
 LOCAL_CFLAGS += -DGPU_G6110
 LOCAL_C_INCLUDES += \
-        system/core/libion/original-kernel-headers
+    system/memory/libion/original-kernel-headers
 endif
 
-ifeq ($(strip $(BOARD_USE_DRM)), true)
-ifneq ($(filter rk3399 rk3366 rk3288 rk3128h rk322x rk3126c rk3328 rk3326 rk3399pro rk3228h, $(strip $(TARGET_BOARD_PLATFORM))), )
-        LOCAL_CFLAGS += -DUSE_DRM -DRK_DRM_GRALLOC=1 -DMALI_AFBC_GRALLOC=1
-
-ifeq ($(TARGET_USES_HWC2),true)
-	LOCAL_CFLAGS += -DUSE_HWC2
-endif
-
-endif
-endif
 
 include $(BUILD_SHARED_LIBRARY)
-
-
