@@ -86,4 +86,4 @@ endif
 
 LOCAL_CFLAGS += -Werror
 
-include $(PREBUILT_SHARED_LIBRARY)
+include $(BUILD_SHARED_LIBRARY)
